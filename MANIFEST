@@ -1,0 +1,19 @@
+# $Id: MANIFEST,v 1.5 2004/09/06 11:13:55 vman Exp $
+
+Changes
+Libdnet.pm
+Libdnet.xs
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/01-module.t
+t/02-addr.t
+t/03-arp.t
+t/04-blob.t
+t/05-eth.t
+t/06-fw.t
+t/07-intf.t
+t/08-ip.t
+t/09-rand.t
+t/10-route.t
