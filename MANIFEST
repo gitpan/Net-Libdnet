@@ -1,8 +1,34 @@
-# $Id: MANIFEST,v 1.5 2004/09/06 11:13:55 vman Exp $
-
+bin/dnet.pl
+c/arp_entry.c
+c/fw_rule.c
 Changes
-Libdnet.pm
+c/intf_entry.c
+c/route_entry.c
+examples/arp-add.pl
+examples/arp-delete.pl
+examples/arp-get.pl
+examples/arp-list.pl
+examples/eth-send.pl
+examples/fw-add.pl
+examples/fw-delete.pl
+examples/fw-list.pl
+examples/intf-get-dst.pl
+examples/intf-get.pl
+examples/intf-get-src.pl
+examples/intf-list.pl
+examples/ip-send.pl
+examples/route-get.pl
+examples/route-list.pl
+examples/tun-open.pl
 Libdnet.xs
+lib/Net/Libdnet/Arp.pm
+lib/Net/Libdnet/Eth.pm
+lib/Net/Libdnet/Fw.pm
+lib/Net/Libdnet/Intf.pm
+lib/Net/Libdnet/Ip.pm
+lib/Net/Libdnet.pm
+lib/Net/Libdnet/Route.pm
+lib/Net/Libdnet/Tun.pm
 LICENSE
 Makefile.PL
 MANIFEST
@@ -17,3 +43,7 @@ t/07-intf.t
 t/08-ip.t
 t/09-rand.t
 t/10-route.t
+t/20-pod-coverage.t
+t/21-test-pod.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

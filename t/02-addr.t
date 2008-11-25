@@ -1,5 +1,7 @@
 #!/usr/bin/perl
-# $Id: 02-addr.t,v 1.6 2004/09/06 11:26:16 vman Exp $
+#
+# $Id: 02-addr.t 3 2008-11-25 19:56:47Z gomor $
+#
 
 use Test;
 BEGIN{ plan tests => 18 };

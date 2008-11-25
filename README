@@ -1,5 +1,5 @@
-Net/Dnet version 1.0
-=====================
+Net::Libdnet
+============
 
 DESCRIPTION
 
@@ -36,7 +36,19 @@ and have root privileges to run the non-faked tests.
 
 DEPENDENCIES
 
-This module depends on libdnet (http://libdnet.sourceforge.net/). Some
-complementary facilities are provided by libpcap and the Net::Pcap
-Perl module.
+This module requires these other modules and libraries:
+
+  Perl v5.6.1
+  libdnet
+  Class::Gomor
+
+libdnet may be obtained from http://libdnet.sourceforge.net/.
+
+COPYRIGHT AND LICENSE
+
+You may distribute this module under the terms of the BSD license.
+See LICENSE file in the source distribution archive.
+
+Copyright (c) 2004, Vlad Manilici
+Copyright (c) 2008, Patrice <GomoR> Auffret
 

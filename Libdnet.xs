@@ -1,6 +1,8 @@
-/* $Id: Libdnet.xs,v 1.3 2004/09/06 14:43:12 vman Exp $ */
+/* $Id: Libdnet.xs 12 2008-11-25 21:08:35Z gomor $ */
 
-/* Copyright (c) 2004 Vlad Manilici
+/*
+ * Copyright (c) 2004 Vlad Manilici
+ * Copyright (c) 2008 Patrice <GomoR> Auffret
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,108 +36,202 @@
 #include <stdio.h>
 #include <dnet.h>
 
-HV * intf2hash(struct intf_entry *IeInt){
-	HV *HvInt, *HvUndef;
-	SV *SvData, *SvKey;
-	char *StrAddr;
+typedef blob_t              Blob;
+typedef eth_addr_t          EthAddr;
+typedef eth_t               EthHandle;
+typedef intf_t              IntfHandle;
+typedef arp_t               ArpHandle;
+typedef fw_t                FwHandle;
+typedef route_t             RouteHandle;
+typedef tun_t               TunHandle;
+typedef ip_t                IpHandle;
+typedef struct intf_entry   IntfEntry;
+typedef struct arp_entry    ArpEntry;
+typedef struct fw_rule      FwRule;
+typedef struct route_entry  RouteEntry;
 
-	/* prepare undefined hash */
-	HvUndef = newHV();
-	hv_undef(HvUndef);
+#include "c/intf_entry.c"
+#include "c/arp_entry.c"
+#include "c/route_entry.c"
+#include "c/fw_rule.c"
 
-	HvInt = newHV();
+static SV * keepSub = (SV *)NULL;
 
-	/* intf_len */
-	SvKey = newSVpv("len", 0);
-	SvData = newSVnv((double) IeInt->intf_len);
-	if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
-		warn("intf2hash: error: intf_len\n");
-		return HvUndef;
-	}
-
-	/* intf_name */
-	SvKey = newSVpv("name", 0);
-	SvData = newSVpv(IeInt->intf_name, 0);
-	if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
-		warn("intf2hash: error: int_name\n");
-		return HvUndef;
-	}
-
-	/* intf_type */
-	SvKey = newSVpv("type", 0);
-	SvData = newSVnv((double) IeInt->intf_type);
-	if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
-		warn("intf2hash: error: intf_type\n");
-		return HvUndef;
-	}
-
-	/* intf_flags */
-	SvKey = newSVpv("flags", 0);
-	SvData = newSVnv((double) IeInt->intf_flags);
-	if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
-		warn("intf2hash: error: intf_flags\n");
-		return HvUndef;
-	}
-
-	/* intf_mtu */
-	SvKey = newSVpv("mtu", 0);
-	SvData = newSVnv((double) IeInt->intf_mtu);
-	if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
-		warn("intf2hash: error: intf_mtu\n");
-		return HvUndef;
-	}
-
-	/* intf_addr */
-	SvKey = newSVpv("addr", 0);
-	/* does not allways exist */
-	StrAddr = addr_ntoa(&(IeInt->intf_addr));
-	if( StrAddr == NULL ){
-		SvData = &PL_sv_undef;
-	}else{
-		SvData = newSVpv(addr_ntoa(&(IeInt->intf_addr)), 0);
-	}
-	if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
-		warn("intf2hash: error: intf_addr\n");
-		return HvUndef;
-	}
-
-	/* intf_dst_addr */
-	SvKey = newSVpv("dst_addr", 0);
-	/* does not allways exist */
-	StrAddr = addr_ntoa(&(IeInt->intf_dst_addr));
-	if( StrAddr == NULL ){
-		SvData = &PL_sv_undef;
-	}else{
-		SvData = newSVpv(addr_ntoa(&(IeInt->intf_dst_addr)), 0);
-	}
-	if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
-		warn("intf2hash: error: intf_dst_addr\n");
-		return HvUndef;
-	}
-
-	/* intf_link_addr */
-	SvKey = newSVpv("link_addr", 0);
-	/* does not allways exist */
-	StrAddr = addr_ntoa(&(IeInt->intf_link_addr));
-	if( StrAddr == NULL ){
-		SvData = &PL_sv_undef;
-	}else{
-		SvData = newSVpv(addr_ntoa(&(IeInt->intf_link_addr)), 0);
-	}
-	if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
-		warn("intf2hash: error: intf_link_addr\n");
-		return HvUndef;
-	}
-
-	/* XXX skipped the aliases problematic */
-
-	return HvInt;
+static int
+intf_callback(IntfEntry *entry, SV *data)
+{
+   dSP;
+   int ret;
+   SV *e = intf_c2sv(entry);
+   ENTER; SAVETMPS; PUSHMARK(SP);
+   XPUSHs(e);
+   XPUSHs(data);
+   PUTBACK;
+   call_sv(keepSub, G_DISCARD);
+   SPAGAIN;
+   FREETMPS; LEAVE;
+   return 0;
 }
 
-MODULE=Net::Libdnet PACKAGE=Net::Libdnet
+static int
+route_callback(RouteEntry *entry, SV *data)
+{
+   dSP;
+   int ret;
+   SV *e = route_c2sv(entry);
+   ENTER; SAVETMPS; PUSHMARK(SP);
+   XPUSHs(e);
+   XPUSHs(data);
+   //XPUSHs(sv_setref_pv(sv_newmortal(), "RouteEntryPtr", entry));
+   //XPUSHs(sv_setref_pv(sv_newmortal(), Nullch, data));
+   PUTBACK;
+   call_sv(keepSub, G_DISCARD);
+   SPAGAIN;
+   //ret = POPi;
+   FREETMPS; LEAVE;
+   //return ret;
+   return 0;
+}
+
+static int
+arp_callback(ArpEntry *entry, SV *data)
+{
+   dSP;
+   int ret;
+   SV *e = arp_c2sv(entry);
+   ENTER; SAVETMPS; PUSHMARK(SP);
+   XPUSHs(e);
+   XPUSHs(data);
+   PUTBACK;
+   call_sv(keepSub, G_DISCARD);
+   SPAGAIN;
+   FREETMPS; LEAVE;
+   return 0;
+}
+
+static int
+fw_callback(FwRule *rule, SV *data)
+{
+   dSP;
+   int ret;
+   SV *e = fw_c2sv(rule);
+   ENTER; SAVETMPS; PUSHMARK(SP);
+   XPUSHs(e);
+   XPUSHs(data);
+   PUTBACK;
+   call_sv(keepSub, G_DISCARD);
+   SPAGAIN;
+   FREETMPS; LEAVE;
+   return 0;
+}
+
+HV * intf2hash(struct intf_entry *IeInt){
+        HV *HvInt, *HvUndef;
+        SV *SvData, *SvKey;
+        char *StrAddr;
+
+        /* prepare undefined hash */
+        HvUndef = newHV();
+        hv_undef(HvUndef);
+
+        HvInt = newHV();
+
+        /* intf_len */
+        SvKey = newSVpv("len", 0);
+        SvData = newSVnv((double) IeInt->intf_len);
+        if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
+                warn("intf2hash: error: intf_len\n");
+                return HvUndef;
+        }
+
+        /* intf_name */
+        SvKey = newSVpv("name", 0);
+        SvData = newSVpv(IeInt->intf_name, 0);
+        if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
+                warn("intf2hash: error: int_name\n");
+                return HvUndef;
+        }
+
+        /* intf_type */
+        SvKey = newSVpv("type", 0);
+        SvData = newSVnv((double) IeInt->intf_type);
+        if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
+                warn("intf2hash: error: intf_type\n");
+                return HvUndef;
+        }
+
+        /* intf_flags */
+        SvKey = newSVpv("flags", 0);
+        SvData = newSVnv((double) IeInt->intf_flags);
+        if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
+                warn("intf2hash: error: intf_flags\n");
+                return HvUndef;
+        }
+
+        /* intf_mtu */
+        SvKey = newSVpv("mtu", 0);
+        SvData = newSVnv((double) IeInt->intf_mtu);
+        if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
+                warn("intf2hash: error: intf_mtu\n");
+                return HvUndef;
+        }
+
+        /* intf_addr */
+        SvKey = newSVpv("addr", 0);
+        /* does not allways exist */
+        StrAddr = addr_ntoa(&(IeInt->intf_addr));
+        if( StrAddr == NULL ){
+                SvData = &PL_sv_undef;
+        }else{
+                SvData = newSVpv(addr_ntoa(&(IeInt->intf_addr)), 0);
+        }
+        if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
+                warn("intf2hash: error: intf_addr\n");
+                return HvUndef;
+        }
+
+        /* intf_dst_addr */
+        SvKey = newSVpv("dst_addr", 0);
+        /* does not allways exist */
+        StrAddr = addr_ntoa(&(IeInt->intf_dst_addr));
+        if( StrAddr == NULL ){
+                SvData = &PL_sv_undef;
+        }else{
+                SvData = newSVpv(addr_ntoa(&(IeInt->intf_dst_addr)), 0);
+        }
+        if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
+                warn("intf2hash: error: intf_dst_addr\n");
+                return HvUndef;
+        }
+
+        /* intf_link_addr */
+        SvKey = newSVpv("link_addr", 0);
+        /* does not allways exist */
+        StrAddr = addr_ntoa(&(IeInt->intf_link_addr));
+        if( StrAddr == NULL ){
+                SvData = &PL_sv_undef;
+        }else{
+                SvData = newSVpv(addr_ntoa(&(IeInt->intf_link_addr)), 0);
+        }
+        if( hv_store_ent(HvInt, SvKey, SvData, 0) == NULL ){
+                warn("intf2hash: error: intf_link_addr\n");
+                return HvUndef;
+        }
+
+        /* XXX skipped the aliases problematic */
+
+        return HvInt;
+}
+
+MODULE = Net::Libdnet  PACKAGE = Net::Libdnet
+PROTOTYPES: DISABLE
+
+#
+# The following are obsolete functions, but stills there for compatibility reasons
+#
 
 SV *
-addr_cmp(SvA, SvB)
+obsolete_addr_cmp(SvA, SvB)
 		SV *SvA;
 		SV *SvB;
 	PROTOTYPE: $$
@@ -180,7 +276,7 @@ addr_cmp(SvA, SvB)
 	RETVAL
 
 SV *
-addr_bcast(SvAd)
+obsolete_addr_bcast(SvAd)
 		SV *SvAd;
 	PROTOTYPE: $
 	CODE:
@@ -218,7 +314,7 @@ addr_bcast(SvAd)
 	RETVAL
 
 SV *
-addr_net(SvAd)
+obsolete_addr_net(SvAd)
 		SV *SvAd;
 	PROTOTYPE: $
 	CODE:
@@ -256,7 +352,7 @@ addr_net(SvAd)
 	RETVAL
 
 SV*
-arp_add(SvProtoAddr, SvHwAddr)
+obsolete_arp_add(SvProtoAddr, SvHwAddr)
 		SV *SvProtoAddr;
 		SV *SvHwAddr;
 	PROTOTYPE: $$
@@ -320,7 +416,7 @@ arp_add(SvProtoAddr, SvHwAddr)
 	RETVAL
 
 SV*
-arp_delete(SvProtoAddr)
+obsolete_arp_delete(SvProtoAddr)
 		SV *SvProtoAddr;
 	PROTOTYPE: $
 	CODE:
@@ -369,7 +465,7 @@ arp_delete(SvProtoAddr)
 	RETVAL
 
 SV*
-arp_get(SvProtoAddr)
+obsolete_arp_get(SvProtoAddr)
 		SV *SvProtoAddr;
 	PROTOTYPE: $
 	CODE:
@@ -425,7 +521,7 @@ arp_get(SvProtoAddr)
 	RETVAL
 
 HV *
-intf_get(SvName)
+obsolete_intf_get(SvName)
 		SV *SvName;
 	PROTOTYPE: $
 	CODE:
@@ -470,7 +566,7 @@ intf_get(SvName)
 	RETVAL
 
 HV *
-intf_get_src(SvAddr)
+obsolete_intf_get_src(SvAddr)
 		SV *SvAddr;
 	PROTOTYPE: $
 	CODE:
@@ -521,7 +617,7 @@ intf_get_src(SvAddr)
 	RETVAL
 
 HV *
-intf_get_dst(SvAddr)
+obsolete_intf_get_dst(SvAddr)
 		SV *SvAddr;
 	PROTOTYPE: $
 	CODE:
@@ -572,7 +668,7 @@ intf_get_dst(SvAddr)
 	RETVAL
 
 SV*
-route_add(SvDstAddr, SvGwAddr)
+obsolete_route_add(SvDstAddr, SvGwAddr)
 		SV *SvDstAddr;
 		SV *SvGwAddr;
 	PROTOTYPE: $$
@@ -636,7 +732,7 @@ route_add(SvDstAddr, SvGwAddr)
 	RETVAL
 
 SV*
-route_delete(SvDstAddr)
+obsolete_route_delete(SvDstAddr)
 		SV *SvDstAddr;
 	PROTOTYPE: $
 	CODE:
@@ -685,7 +781,7 @@ route_delete(SvDstAddr)
 	RETVAL
 
 SV*
-route_get(SvDstAddr)
+obsolete_route_get(SvDstAddr)
 		SV *SvDstAddr;
 	PROTOTYPE: $
 	CODE:
@@ -740,3 +836,466 @@ route_get(SvDstAddr)
 	OUTPUT:
 	RETVAL
 
+#
+# The following are the new XS implementation. I prefixed with dnet_ in order to not clash with obsolete functions.
+#
+
+IntfHandle *
+dnet_intf_open()
+   CODE:
+      RETVAL = intf_open();
+   OUTPUT:
+      RETVAL
+
+SV *
+dnet_intf_get(handle, entry)
+      IntfHandle *handle
+      SV         *entry
+   INIT:
+      char        buf[1024];
+      IntfEntry  *intfEntry    = (IntfEntry *)buf;
+      IntfEntry  *intfEntryPtr = NULL;
+      memset(buf, 0, sizeof(buf));
+      intfEntryPtr = intf_sv2c(entry, intfEntry);
+      intfEntry->intf_len = sizeof(buf);
+   CODE:
+      if (intf_get(handle, intfEntryPtr) == -1) { XSRETURN_UNDEF; }
+      else { RETVAL = intf_c2sv(intfEntry); }
+   OUTPUT:
+      RETVAL
+
+SV *
+dnet_intf_get_src(handle, src)
+      IntfHandle *handle
+      SV         *src
+   INIT:
+      char        buf[1024];
+      IntfEntry  *intfEntry = (IntfEntry *)buf;
+      memset(buf, 0, sizeof(buf));
+      struct addr aSrc;
+      intfEntry->intf_len = sizeof(buf);
+      memset(&aSrc, 0, sizeof(struct addr));
+      int ret = addr_aton(SvPV(src, PL_na), &aSrc);
+   CODE:
+      if (! ret && intf_get_src(handle, intfEntry, &aSrc) == -1) {
+         XSRETURN_UNDEF;
+      }
+      else { RETVAL = intf_c2sv(intfEntry); }
+   OUTPUT:
+      RETVAL
+
+SV *
+dnet_intf_get_dst(handle, dst)
+      IntfHandle *handle
+      SV         *dst
+   INIT:
+      char        buf[1024];
+      IntfEntry  *intfEntry = (IntfEntry *)buf;
+      struct addr aDst;
+      memset(buf, 0, sizeof(buf));
+      intfEntry->intf_len = sizeof(buf);
+      memset(&aDst, 0, sizeof(struct addr));
+      int ret = addr_aton(SvPV(dst, PL_na), &aDst);
+   CODE:
+      if (! ret && intf_get_dst(handle, intfEntry, &aDst) == -1) {
+         XSRETURN_UNDEF;
+      }
+      else { RETVAL = intf_c2sv(intfEntry); }
+   OUTPUT:
+      RETVAL
+
+int
+dnet_intf_set(handle, entry)
+      IntfHandle *handle
+      SV         *entry
+   INIT:
+      IntfEntry *intfEntryPtr = NULL;
+      IntfEntry  intfEntry;
+      intfEntryPtr = intf_sv2c(entry, &intfEntry);
+   CODE:
+      if (intf_set(handle, &intfEntry) == -1) { XSRETURN_UNDEF; }
+      else { RETVAL = 1; }
+   OUTPUT:
+      RETVAL
+
+int
+dnet_intf_loop(handle, callback, data)
+      IntfHandle *handle
+      SV         *callback
+      SV         *data
+   CODE:
+      if (keepSub == (SV *)NULL)
+         keepSub = newSVsv(callback);
+      else
+         SvSetSV(keepSub, callback);
+      RETVAL = intf_loop(handle, (intf_handler)intf_callback, data);
+   OUTPUT:
+      RETVAL
+
+IntfHandle *
+dnet_intf_close(handle)
+      IntfHandle *handle
+   CODE:
+      RETVAL = intf_close(handle);
+   OUTPUT:
+      RETVAL
+
+ArpHandle *
+dnet_arp_open()
+   CODE:
+      RETVAL = arp_open();
+   OUTPUT:
+      RETVAL
+
+int
+dnet_arp_add(handle, entry)
+      ArpHandle *handle
+      SV        *entry
+   INIT:
+      ArpEntry *arpEntryPtr = NULL;
+      ArpEntry  arpEntry;
+      arpEntryPtr = arp_sv2c(entry, &arpEntry);
+   CODE:
+      RETVAL = arp_add(handle, arpEntryPtr);
+      if (RETVAL == -1) { XSRETURN_UNDEF; }
+      else { RETVAL = 1; }
+   OUTPUT:
+      RETVAL
+
+int
+dnet_arp_delete(handle, entry)
+      ArpHandle *handle
+      SV        *entry
+   INIT:
+      ArpEntry *arpEntryPtr = NULL;
+      ArpEntry  arpEntry;
+      arpEntryPtr = arp_sv2c(entry, &arpEntry);
+   CODE:
+      RETVAL = arp_delete(handle, arpEntryPtr);
+      if (RETVAL == -1) { XSRETURN_UNDEF; }
+      else { RETVAL = 1; }
+   OUTPUT:
+      RETVAL
+
+SV *
+dnet_arp_get(handle, entry)
+      ArpHandle *handle
+      SV        *entry
+   INIT:
+      ArpEntry *arpEntryPtr = NULL;
+      ArpEntry  arpEntry;
+      arpEntryPtr = arp_sv2c(entry, &arpEntry);
+   CODE:
+      if (arp_get(handle, arpEntryPtr) == -1) { XSRETURN_UNDEF; }
+      else { RETVAL = arp_c2sv(arpEntryPtr); }
+   OUTPUT:
+      RETVAL 
+
+int
+dnet_arp_loop(handle, callback, data)
+      ArpHandle *handle
+      SV        *callback
+      SV        *data
+   CODE:
+      if (keepSub == (SV *)NULL)
+         keepSub = newSVsv(callback);
+      else
+         SvSetSV(keepSub, callback);
+      RETVAL = arp_loop(handle, (arp_handler)arp_callback, data);
+   OUTPUT:
+      RETVAL
+
+ArpHandle *
+dnet_arp_close(handle)
+      ArpHandle *handle
+   CODE:
+      RETVAL = arp_close(handle);
+   OUTPUT:
+      RETVAL
+
+RouteHandle *
+dnet_route_open()
+   CODE:
+      RETVAL = route_open();
+   OUTPUT:
+      RETVAL
+
+int
+dnet_route_add(handle, entry)
+      RouteHandle *handle
+      SV          *entry
+   INIT:
+      RouteEntry *routeEntryPtr = NULL;
+      RouteEntry  routeEntry;
+      routeEntryPtr = route_sv2c(entry, &routeEntry);
+   CODE:
+      RETVAL = route_add(handle, routeEntryPtr);
+      if (RETVAL == -1) { XSRETURN_UNDEF; }
+      else { RETVAL = 1; }
+   OUTPUT:
+      RETVAL
+
+int
+dnet_route_delete(handle, entry)
+      RouteHandle *handle
+      SV          *entry
+   INIT:
+      RouteEntry *routeEntryPtr = NULL;
+      RouteEntry  routeEntry;
+      routeEntryPtr = route_sv2c(entry, &routeEntry);
+   CODE:
+      RETVAL = route_delete(handle, routeEntryPtr);
+      if (RETVAL == -1) { XSRETURN_UNDEF; }
+      else { RETVAL = 1; }
+   OUTPUT:
+      RETVAL
+
+SV *
+dnet_route_get(handle, entry)
+      RouteHandle *handle
+      SV          *entry
+   INIT:
+      RouteEntry *routeEntryPtr = NULL;
+      RouteEntry  routeEntry;
+      routeEntryPtr = route_sv2c(entry, &routeEntry);
+   CODE:
+      if (route_get(handle, routeEntryPtr) == -1) { XSRETURN_UNDEF; }
+      else { RETVAL = route_c2sv(routeEntryPtr); }
+   OUTPUT:
+      RETVAL 
+
+int
+dnet_route_loop(handle, callback, data)
+      RouteHandle *handle
+      SV          *callback
+      SV          *data
+   CODE:
+      if (keepSub == (SV *)NULL)
+         keepSub = newSVsv(callback);
+      else
+         SvSetSV(keepSub, callback);
+      RETVAL = route_loop(handle, (route_handler)route_callback, data);
+      //printf("RETVAL: %d\n", RETVAL);
+   OUTPUT:
+      RETVAL
+
+RouteHandle *
+dnet_route_close(handle)
+      RouteHandle *handle
+   CODE:
+      RETVAL = route_close(handle);
+   OUTPUT:
+      RETVAL
+
+FwHandle *
+dnet_fw_open()
+   CODE:
+      RETVAL = fw_open();
+   OUTPUT:
+      RETVAL
+
+int
+dnet_fw_add(handle, rule)
+      FwHandle *handle
+      SV       *rule
+   INIT:
+      FwRule *fwRulePtr = NULL;
+      FwRule  fwRule;
+      fwRulePtr = fw_sv2c(rule, &fwRule);
+   CODE:
+      RETVAL = fw_add(handle, fwRulePtr);
+      if (RETVAL == -1) { XSRETURN_UNDEF; }
+      else { RETVAL = 1; }
+   OUTPUT:
+      RETVAL
+
+int
+dnet_fw_delete(handle, rule)
+      FwHandle *handle
+      SV       *rule
+   INIT:
+      FwRule *fwRulePtr = NULL;
+      FwRule  fwRule;
+      fwRulePtr = fw_sv2c(rule, &fwRule);
+   CODE:
+      RETVAL = fw_delete(handle, fwRulePtr);
+      if (RETVAL == -1) { XSRETURN_UNDEF; }
+      else { RETVAL = 1; }
+   OUTPUT:
+      RETVAL
+
+int
+dnet_fw_loop(handle, callback, data)
+      FwHandle *handle
+      SV       *callback
+      SV       *data
+   CODE:
+      if (keepSub == (SV *)NULL)
+         keepSub = newSVsv(callback);
+      else
+         SvSetSV(keepSub, callback);
+      RETVAL = fw_loop(handle, (fw_handler)fw_callback, data);
+   OUTPUT:
+      RETVAL
+
+FwHandle *
+dnet_fw_close(handle)
+      FwHandle *handle
+   CODE:
+      RETVAL = fw_close(handle);
+   OUTPUT:
+      RETVAL
+
+TunHandle *
+dnet_tun_open(src, dst, size)
+      SV *src
+      SV *dst
+      int size
+   INIT:
+      struct addr aSrc;
+      struct addr aDst;
+      memset(&aSrc, 0, sizeof(struct addr));
+      memset(&aDst, 0, sizeof(struct addr));
+   CODE:
+      if (addr_aton(SvPV(src, PL_na), &aSrc)) { XSRETURN_UNDEF; }
+      if (addr_aton(SvPV(dst, PL_na), &aDst)) { XSRETURN_UNDEF; }
+      RETVAL = tun_open(&aSrc, &aDst, size);
+   OUTPUT:
+      RETVAL
+
+int
+dnet_tun_fileno(handle)
+      TunHandle *handle
+   CODE:
+      RETVAL = tun_fileno(handle);
+      if (RETVAL == -1) { XSRETURN_UNDEF; }
+   OUTPUT:
+      RETVAL
+
+const char *
+dnet_tun_name(handle)
+      TunHandle *handle
+   CODE:
+      RETVAL = tun_name(handle);
+      if (RETVAL == NULL) { XSRETURN_UNDEF; }
+   OUTPUT:
+      RETVAL
+
+int
+dnet_tun_send(handle, buf, size)
+      TunHandle *handle
+      SV        *buf
+      int        size
+   CODE:
+      RETVAL = tun_send(handle, SvPV(buf, PL_na), size);
+      if (RETVAL == -1) { XSRETURN_UNDEF; }
+   OUTPUT:
+      RETVAL
+
+SV *
+dnet_tun_recv(handle, size)
+      TunHandle *handle
+      int        size
+   INIT:
+      int read;
+      unsigned char buf[size+1];
+      memset(buf, 0, size+1);
+   CODE:
+      if ((read = tun_recv(handle, buf, size)) > 0) {
+         RETVAL = newSVpv(buf, read);
+      }
+      else { XSRETURN_UNDEF; }
+   OUTPUT:
+      RETVAL
+
+TunHandle *
+dnet_tun_close(handle)
+      TunHandle *handle
+   CODE:
+      RETVAL = tun_close(handle);
+   OUTPUT:
+      RETVAL
+
+EthHandle *
+dnet_eth_open(device)
+      SV *device
+   CODE:
+      RETVAL = eth_open(SvPV(device, PL_na));
+   OUTPUT:
+      RETVAL
+
+SV *
+dnet_eth_get(handle)
+      EthHandle *handle
+   INIT:
+      char *addr;
+      EthAddr a;
+      memset(&a, 0, sizeof(EthAddr));
+   CODE:
+      if (eth_get(handle, &a) == -1)     { XSRETURN_UNDEF; }
+      if ((addr = eth_ntoa(&a)) == NULL) { XSRETURN_UNDEF; }
+      else { RETVAL = newSVpv(addr, 0); }
+   OUTPUT:
+      RETVAL
+
+int
+dnet_eth_set(handle, addr)
+      EthHandle *handle
+      SV        *addr
+   CODE:
+      RETVAL = eth_set(handle, (const EthAddr *)SvPV(addr, PL_na));
+      if (RETVAL == -1) { XSRETURN_UNDEF; }
+   OUTPUT:
+      RETVAL
+
+int
+dnet_eth_send(handle, buf, size)
+      EthHandle *handle
+      SV        *buf
+      int        size
+   CODE:
+      RETVAL = eth_send(handle, SvPV(buf, PL_na), size);
+      if (RETVAL == -1) { XSRETURN_UNDEF; }
+   OUTPUT:
+      RETVAL
+
+EthHandle *
+dnet_eth_close(handle)
+      EthHandle *handle
+   CODE:
+      RETVAL = eth_close(handle);
+   OUTPUT:
+      RETVAL
+
+IpHandle *
+dnet_ip_open()
+   CODE:
+      RETVAL = ip_open();
+   OUTPUT:
+      RETVAL
+
+int
+dnet_ip_send(handle, buf, size)
+      IpHandle *handle
+      SV       *buf
+      int       size
+   CODE:
+      RETVAL = ip_send(handle, SvPV(buf, PL_na), size);
+      if (RETVAL == -1) { XSRETURN_UNDEF; }
+   OUTPUT:
+      RETVAL
+
+void
+dnet_ip_checksum(buf, size)
+      SV *buf
+      int size
+   CODE:
+      ip_checksum(SvPV(buf, PL_na), size);
+
+IpHandle *
+dnet_ip_close(handle)
+      IpHandle *handle
+   CODE:
+      RETVAL = ip_close(handle);
+   OUTPUT:
+      RETVAL
