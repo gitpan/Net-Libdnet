@@ -1,11 +1,11 @@
 #
-# $Id: Arp.pm 13 2008-11-25 21:36:12Z gomor $
+# $Id: Arp.pm 19 2008-12-06 17:06:25Z gomor $
 #
 package Net::Libdnet::Arp;
 use strict; use warnings;
 
-require Class::Gomor::Array;
-our @ISA = qw(Class::Gomor::Array);
+use base qw(Class::Gomor::Array);
+
 our @AS  = qw(
    _handle
 );

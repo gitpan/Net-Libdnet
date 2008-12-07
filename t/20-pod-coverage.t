@@ -1,4 +1,4 @@
-eval "use Test::Pod::Coverage tests => 8";
+eval "use Test::Pod::Coverage tests => 9";
 if ($@) {
    use Test;
    plan(tests => 1);
@@ -13,4 +13,5 @@ else {
    pod_coverage_ok("Net::Libdnet::Eth");
    pod_coverage_ok("Net::Libdnet::Ip");
    pod_coverage_ok("Net::Libdnet::Tun");
+   pod_coverage_ok("Net::Libdnet::Entry::Intf");
 }

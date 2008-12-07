@@ -4,8 +4,7 @@ use strict; use warnings;
 my $dst = shift || die("Pass destination IP");
 
 use Net::Libdnet::Intf;
-use Data::Dumper;
 
 my $h = Net::Libdnet::Intf->new;
 my $info = $h->getDst($dst);
-print Dumper($info)."\n";
+print $info->print."\n";

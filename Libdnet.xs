@@ -1,4 +1,4 @@
-/* $Id: Libdnet.xs 12 2008-11-25 21:08:35Z gomor $ */
+/* $Id: Libdnet.xs 19 2008-12-06 17:06:25Z gomor $ */
 
 /*
  * Copyright (c) 2004 Vlad Manilici
@@ -231,7 +231,7 @@ PROTOTYPES: DISABLE
 #
 
 SV *
-obsolete_addr_cmp(SvA, SvB)
+_obsolete_addr_cmp(SvA, SvB)
 		SV *SvA;
 		SV *SvB;
 	PROTOTYPE: $$
@@ -276,7 +276,7 @@ obsolete_addr_cmp(SvA, SvB)
 	RETVAL
 
 SV *
-obsolete_addr_bcast(SvAd)
+_obsolete_addr_bcast(SvAd)
 		SV *SvAd;
 	PROTOTYPE: $
 	CODE:
@@ -314,7 +314,7 @@ obsolete_addr_bcast(SvAd)
 	RETVAL
 
 SV *
-obsolete_addr_net(SvAd)
+_obsolete_addr_net(SvAd)
 		SV *SvAd;
 	PROTOTYPE: $
 	CODE:
@@ -352,7 +352,7 @@ obsolete_addr_net(SvAd)
 	RETVAL
 
 SV*
-obsolete_arp_add(SvProtoAddr, SvHwAddr)
+_obsolete_arp_add(SvProtoAddr, SvHwAddr)
 		SV *SvProtoAddr;
 		SV *SvHwAddr;
 	PROTOTYPE: $$
@@ -416,7 +416,7 @@ obsolete_arp_add(SvProtoAddr, SvHwAddr)
 	RETVAL
 
 SV*
-obsolete_arp_delete(SvProtoAddr)
+_obsolete_arp_delete(SvProtoAddr)
 		SV *SvProtoAddr;
 	PROTOTYPE: $
 	CODE:
@@ -465,7 +465,7 @@ obsolete_arp_delete(SvProtoAddr)
 	RETVAL
 
 SV*
-obsolete_arp_get(SvProtoAddr)
+_obsolete_arp_get(SvProtoAddr)
 		SV *SvProtoAddr;
 	PROTOTYPE: $
 	CODE:
@@ -521,7 +521,7 @@ obsolete_arp_get(SvProtoAddr)
 	RETVAL
 
 HV *
-obsolete_intf_get(SvName)
+_obsolete_intf_get(SvName)
 		SV *SvName;
 	PROTOTYPE: $
 	CODE:
@@ -566,7 +566,7 @@ obsolete_intf_get(SvName)
 	RETVAL
 
 HV *
-obsolete_intf_get_src(SvAddr)
+_obsolete_intf_get_src(SvAddr)
 		SV *SvAddr;
 	PROTOTYPE: $
 	CODE:
@@ -617,7 +617,7 @@ obsolete_intf_get_src(SvAddr)
 	RETVAL
 
 HV *
-obsolete_intf_get_dst(SvAddr)
+_obsolete_intf_get_dst(SvAddr)
 		SV *SvAddr;
 	PROTOTYPE: $
 	CODE:
@@ -668,7 +668,7 @@ obsolete_intf_get_dst(SvAddr)
 	RETVAL
 
 SV*
-obsolete_route_add(SvDstAddr, SvGwAddr)
+_obsolete_route_add(SvDstAddr, SvGwAddr)
 		SV *SvDstAddr;
 		SV *SvGwAddr;
 	PROTOTYPE: $$
@@ -732,7 +732,7 @@ obsolete_route_add(SvDstAddr, SvGwAddr)
 	RETVAL
 
 SV*
-obsolete_route_delete(SvDstAddr)
+_obsolete_route_delete(SvDstAddr)
 		SV *SvDstAddr;
 	PROTOTYPE: $
 	CODE:
@@ -781,7 +781,7 @@ obsolete_route_delete(SvDstAddr)
 	RETVAL
 
 SV*
-obsolete_route_get(SvDstAddr)
+_obsolete_route_get(SvDstAddr)
 		SV *SvDstAddr;
 	PROTOTYPE: $
 	CODE:
@@ -837,7 +837,9 @@ obsolete_route_get(SvDstAddr)
 	RETVAL
 
 #
-# The following are the new XS implementation. I prefixed with dnet_ in order to not clash with obsolete functions.
+# The following are the new XS implementation.
+# I prefixed with dnet_ in order to not clash with libdnet C functions use by 
+# obsolete XS implementation.
 #
 
 IntfHandle *

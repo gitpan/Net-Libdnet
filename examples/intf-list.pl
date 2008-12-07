@@ -2,12 +2,13 @@
 use strict; use warnings;
 
 use Net::Libdnet::Intf;
-use Data::Dumper;
+use Net::Libdnet::Entry::Intf;
 
 my $h = Net::Libdnet::Intf->new;
 $h->loop(\&intf_show);
 
 sub intf_show {
    my ($entry, $data) = @_;
-   print Dumper($entry)."\n";
+   my $e = Net::Libdnet::Entry::Intf->newFromHash($entry);
+   print $e->print."\n";
 }

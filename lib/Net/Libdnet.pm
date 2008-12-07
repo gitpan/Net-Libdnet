@@ -1,5 +1,5 @@
 #
-# $Id: Libdnet.pm 13 2008-11-25 21:36:12Z gomor $
+# $Id: Libdnet.pm 21 2008-12-07 18:20:36Z gomor $
 #
 # Copyright (c) 2004 Vlad Manilici
 # Copyright (c) 2008 Patrice <GomoR> Auffret
@@ -31,11 +31,9 @@
 package Net::Libdnet;
 use strict; use warnings;
 
-our $VERSION = '0.90';
+use base qw(Exporter DynaLoader);
 
-use Exporter;
-use DynaLoader;
-our @ISA = qw(Exporter DynaLoader);
+our $VERSION = '0.91';
 
 our %EXPORT_TAGS = (
    obsolete => [qw(
@@ -106,24 +104,24 @@ our %EXPORT_TAGS = (
       dnet_ip_close
    )],
    consts => [qw(
-      ADDR_TYPE_NONE
-      ADDR_TYPE_ETH
-      ADDR_TYPE_IP
-      ADDR_TYPE_IP6
-      FW_OP_ALLOW
-      FW_OP_BLOCK
-      FW_DIR_IN
-      FW_DIR_OUT
-      INTF_TYPE_OTHER
-      INTF_TYPE_ETH
-      INTF_TYPE_LOOPBACK
-      INTF_TYPE_TUN
-      INTF_FLAG_UP
-      INTF_FLAG_LOOPBACK
-      INTF_FLAG_POINTOPOINT
-      INTF_FLAG_NOARP
-      INTF_FLAG_BROADCAST
-      INTF_FLAG_MULTICAST
+      DNET_ADDR_TYPE_NONE
+      DNET_ADDR_TYPE_ETH
+      DNET_ADDR_TYPE_IP
+      DNET_ADDR_TYPE_IP6
+      DNET_FW_OP_ALLOW
+      DNET_FW_OP_BLOCK
+      DNET_FW_DIR_IN
+      DNET_FW_DIR_OUT
+      DNET_INTF_TYPE_OTHER
+      DNET_INTF_TYPE_ETH
+      DNET_INTF_TYPE_LOOPBACK
+      DNET_INTF_TYPE_TUN
+      DNET_INTF_FLAG_UP
+      DNET_INTF_FLAG_LOOPBACK
+      DNET_INTF_FLAG_POINTOPOINT
+      DNET_INTF_FLAG_NOARP
+      DNET_INTF_FLAG_BROADCAST
+      DNET_INTF_FLAG_MULTICAST
    )],
 );
 our @EXPORT = (
@@ -140,39 +138,39 @@ our @EXPORT = (
 
 __PACKAGE__->bootstrap($VERSION);
 
-use constant ADDR_TYPE_NONE => 0;
-use constant ADDR_TYPE_ETH  => 1;
-use constant ADDR_TYPE_IP   => 2;
-use constant ADDR_TYPE_IP6  => 3;
+use constant DNET_ADDR_TYPE_NONE => 0;
+use constant DNET_ADDR_TYPE_ETH  => 1;
+use constant DNET_ADDR_TYPE_IP   => 2;
+use constant DNET_ADDR_TYPE_IP6  => 3;
 
-use constant FW_OP_ALLOW => 1;
-use constant FW_OP_BLOCK => 2;
-use constant FW_DIR_IN   => 1;
-use constant FW_DIR_OUT  => 2;
+use constant DNET_FW_OP_ALLOW => 1;
+use constant DNET_FW_OP_BLOCK => 2;
+use constant DNET_FW_DIR_IN   => 1;
+use constant DNET_FW_DIR_OUT  => 2;
 
-use constant INTF_TYPE_OTHER       => 1;
-use constant INTF_TYPE_ETH         => 6;
-use constant INTF_TYPE_LOOPBACK    => 24;
-use constant INTF_TYPE_TUN         => 53;
-use constant INTF_FLAG_UP          => 0x01;
-use constant INTF_FLAG_LOOPBACK    => 0x02;
-use constant INTF_FLAG_POINTOPOINT => 0x04;
-use constant INTF_FLAG_NOARP       => 0x08;
-use constant INTF_FLAG_BROADCAST   => 0x10;
-use constant INTF_FLAG_MULTICAST   => 0x20;
+use constant DNET_INTF_TYPE_OTHER       => 1;
+use constant DNET_INTF_TYPE_ETH         => 6;
+use constant DNET_INTF_TYPE_LOOPBACK    => 24;
+use constant DNET_INTF_TYPE_TUN         => 53;
+use constant DNET_INTF_FLAG_UP          => 0x01;
+use constant DNET_INTF_FLAG_LOOPBACK    => 0x02;
+use constant DNET_INTF_FLAG_POINTOPOINT => 0x04;
+use constant DNET_INTF_FLAG_NOARP       => 0x08;
+use constant DNET_INTF_FLAG_BROADCAST   => 0x10;
+use constant DNET_INTF_FLAG_MULTICAST   => 0x20;
 
-sub addr_cmp     { obsolete_addr_cmp    (@_) }
-sub addr_bcast   { obsolete_addr_bcast  (@_) }
-sub addr_net     { obsolete_addr_net    (@_) }
-sub arp_add      { obsolete_arp_add     (@_) }
-sub arp_delete   { obsolete_arp_delete  (@_) }
-sub arp_get      { obsolete_arp_get     (@_) }
-sub intf_get     { obsolete_intf_get    (@_) }
-sub intf_get_src { obsolete_intf_get_src(@_) }
-sub intf_get_dst { obsolete_intf_get_dst(@_) }
-sub route_add    { obsolete_route_add   (@_) }
-sub route_delete { obsolete_route_delete(@_) }
-sub route_get    { obsolete_route_get   (@_) }
+sub addr_cmp     { _obsolete_addr_cmp    (@_) }
+sub addr_bcast   { _obsolete_addr_bcast  (@_) }
+sub addr_net     { _obsolete_addr_net    (@_) }
+sub arp_add      { _obsolete_arp_add     (@_) }
+sub arp_delete   { _obsolete_arp_delete  (@_) }
+sub arp_get      { _obsolete_arp_get     (@_) }
+sub intf_get     { _obsolete_intf_get    (@_) }
+sub intf_get_src { _obsolete_intf_get_src(@_) }
+sub intf_get_dst { _obsolete_intf_get_dst(@_) }
+sub route_add    { _obsolete_route_add   (@_) }
+sub route_delete { _obsolete_route_delete(@_) }
+sub route_get    { _obsolete_route_get   (@_) }
 
 1;
 
@@ -413,8 +411,7 @@ Takes an intf handle, and an IP address as parameters. Returns a hash in dnet fo
 
 =item B<dnet_intf_set> (scalar, scalar)
 
-Takes an intf handle, and a hash ref in dnet format as parameters. Returns 1 on success,
- undef on error.
+Takes an intf handle, and a hash ref in dnet format as parameters. Returns 1 on success, undef on error.
 
 =item B<dnet_intf_loop> (scalar, subref, scalarref)
 
@@ -586,75 +583,45 @@ They should not be used anymore. You have been warned.
 
 =back
 
-These ones are used internally only.
-
-=over 4
-
-=item B<obsolete_addr_bcast>
-
-=item B<obsolete_addr_cmp>
-
-=item B<obsolete_addr_net>
-
-=item B<obsolete_arp_add>
-
-=item B<obsolete_arp_delete>
-
-=item B<obsolete_arp_get>
-
-=item B<obsolete_intf_get>
-
-=item B<obsolete_intf_get_dst>
-
-=item B<obsolete_intf_get_src>
-
-=item B<obsolete_route_add>
-
-=item B<obsolete_route_delete>
-
-=item B<obsolete_route_get>
-
-=back
-
 =head1 CONSTANTS
 
 =over 4
 
-=item B<ADDR_TYPE_NONE>
+=item B<DNET_ADDR_TYPE_NONE>
 
-=item B<ADDR_TYPE_ETH>
+=item B<DNET_ADDR_TYPE_ETH>
 
-=item B<ADDR_TYPE_IP>
+=item B<DNET_ADDR_TYPE_IP>
 
-=item B<ADDR_TYPE_IP6>
+=item B<DNET_ADDR_TYPE_IP6>
 
-=item B<FW_OP_ALLOW>
+=item B<DNET_FW_OP_ALLOW>
 
-=item B<FW_OP_BLOCK>
+=item B<DNET_FW_OP_BLOCK>
 
-=item B<FW_DIR_IN>
+=item B<DNET_FW_DIR_IN>
 
-=item B<FW_DIR_OUT>
+=item B<DNET_FW_DIR_OUT>
 
-=item B<INTF_TYPE_OTHER>
+=item B<DNET_INTF_TYPE_OTHER>
 
-=item B<INTF_TYPE_ETH>
+=item B<DNET_INTF_TYPE_ETH>
 
-=item B<INTF_TYPE_LOOPBACK>
+=item B<DNET_INTF_TYPE_LOOPBACK>
 
-=item B<INTF_TYPE_TUN>
+=item B<DNET_INTF_TYPE_TUN>
 
-=item B<INTF_FLAG_UP>
+=item B<DNET_INTF_FLAG_UP>
 
-=item B<INTF_FLAG_LOOPBACK>
+=item B<DNET_INTF_FLAG_LOOPBACK>
 
-=item B<INTF_FLAG_POINTOPOINT>
+=item B<DNET_INTF_FLAG_POINTOPOINT>
 
-=item B<INTF_FLAG_NOARP>
+=item B<DNET_INTF_FLAG_NOARP>
 
-=item B<INTF_FLAG_BROADCAST>
+=item B<DNET_INTF_FLAG_BROADCAST>
 
-=item B<INTF_FLAG_MULTICAST>
+=item B<DNET_INTF_FLAG_MULTICAST>
 
 =back
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: dnet.pl 14 2008-11-25 21:37:59Z gomor $
+# $Id: dnet.pl 19 2008-12-06 17:06:25Z gomor $
 #
 use strict; use warnings;
 
@@ -49,39 +49,13 @@ sub intf_opt {
    #}
 }
 
-sub flags2string {
-   my ($flags) = @_;
-   my $buf = '';
-   if ($flags & INTF_FLAG_UP)          { $buf .= ",UP"          }
-   if ($flags & INTF_FLAG_LOOPBACK)    { $buf .= ",LOOPBACK"    }
-   if ($flags & INTF_FLAG_POINTOPOINT) { $buf .= ",POINTOPOINT" }
-   if ($flags & INTF_FLAG_NOARP)       { $buf .= ",NOARP"       }
-   if ($flags & INTF_FLAG_BROADCAST)   { $buf .= ",BROADCAST"   }
-   if ($flags & INTF_FLAG_MULTICAST)   { $buf .= ",MULTICAST"   }
-   $buf =~ s/^,//;
-   $buf;
-}
-
 sub intf_print {
    my ($e, $data) = @_;
-   printf("%s:", $e->{intf_name});
-   printf(" flags=0x%x<%s>", $e->{intf_flags}, flags2string($e->{intf_flags}));
-   if ($e->{intf_mtu} != 0) {
-      printf(" mtu %d", $e->{intf_mtu});
+   if (ref($e) eq 'HASH') {
+      use Net::Libdnet::Entry::Intf;
+      $e = Net::Libdnet::Entry::Intf->newFromHash($e);
    }
-   printf("\n");
-   if ($e->{intf_addr} && $e->{intf_dst_addr}) {
-      printf("\tinet %s --> %s\n", $e->{intf_addr}, $e->{intf_dst_addr});
-   }
-   elsif ($e->{intf_addr}) {
-      printf("\tinet %s\n", $e->{intf_addr});
-   }
-   if ($e->{intf_link_addr}) {
-      printf("\tlink %s\n", $e->{intf_link_addr});
-   }
-   for (0..$e->{intf_alias_num}-1) {
-      printf("\talias %s\n", $e->{intf_alias_addrs}->[$_]);
-   }
+   print $e->print."\n";
 }
 
 #
@@ -185,10 +159,10 @@ sub fw_print {
    my $dst    = $e->{fw_dst};
    my $sport  = $e->{fw_sport};
    my $dport  = $e->{fw_dport};
-      if ($op == FW_OP_ALLOW) { $op = "allow" }
-   elsif ($op == FW_OP_BLOCK) { $op = "block" }
-      if ($dir == FW_DIR_IN)  { $dir = "in"  }
-   elsif ($dir == FW_DIR_OUT) { $dir = "out" }
+      if ($op == DNET_FW_OP_ALLOW) { $op = "allow" }
+   elsif ($op == DNET_FW_OP_BLOCK) { $op = "block" }
+      if ($dir == DNET_FW_DIR_IN)  { $dir = "in"  }
+   elsif ($dir == DNET_FW_DIR_OUT) { $dir = "out" }
       if ($proto == 6)  { $proto = "tcp"  }
    elsif ($proto == 17) { $proto = "udp"  }
    elsif ($proto == 1)  { $proto = "icmp" }

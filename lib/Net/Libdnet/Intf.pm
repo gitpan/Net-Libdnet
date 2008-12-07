@@ -1,11 +1,11 @@
 #
-# $Id: Intf.pm 13 2008-11-25 21:36:12Z gomor $
+# $Id: Intf.pm 21 2008-12-07 18:20:36Z gomor $
 #
 package Net::Libdnet::Intf;
 use strict; use warnings;
 
-require Class::Gomor::Array;
-our @ISA = qw(Class::Gomor::Array);
+use base qw(Class::Gomor::Array);
+
 our @AS  = qw(
    _handle
 );
@@ -13,37 +13,59 @@ __PACKAGE__->cgBuildIndices;
 __PACKAGE__->cgBuildAccessorsScalar(\@AS);
 
 use Net::Libdnet qw(:intf);
+use Net::Libdnet::Entry::Intf;
 
 sub new {
    my $self   = shift->SUPER::new(@_);
    my $handle = dnet_intf_open() or die("Intf::new: unable to open");
    $self->_handle($handle);
-   $self;
+   return $self;
 }
 
 sub get {
    my $self   = shift,
    my ($intf) = @_;
-   dnet_intf_get($self->_handle, {intf_name => $intf});
+   my $h = dnet_intf_get($self->_handle, { intf_name => $intf })
+      or return;
+   return Net::Libdnet::Entry::Intf->newFromHash($h);
 }
 
 sub getSrc {
    my $self  = shift,
    my ($src) = @_;
-   dnet_intf_get_src($self->_handle, $src);
+   my $h = dnet_intf_get_src($self->_handle, $src)
+      or return;
+   return Net::Libdnet::Entry::Intf->newFromHash($h);
 }
 
 sub getDst {
    my $self  = shift,
    my ($dst) = @_;
-   dnet_intf_get_dst($self->_handle, $dst);
+   my $h = dnet_intf_get_dst($self->_handle, $dst)
+      or return;
+   return Net::Libdnet::Entry::Intf->newFromHash($h);
+}
+
+sub getSrcIntfFromDst {
+   my $self = shift;
+   my ($dst) = @_;
+   my $e = $self->getDst($dst) or return;
+   return $e->name;
+}
+
+sub getSrcIpFromDst {
+   my $self = shift;
+   my ($dst) = @_;
+   my $e = $self->getDst($dst) or return;
+   return $e->addr;
 }
 
 sub set {
    my $self = shift;
-   my ($h)  = @_;
-   # XXX: write using only args on input, and put them into a hash
-   dnet_intf_set($self->_handle, $h);
+   my ($entry) = @_;
+   my $r = dnet_intf_set($self->_handle, $entry)
+      or return;
+   return $self;
 }
 
 sub loop {
@@ -88,6 +110,14 @@ XXX
 =item B<set>
 
 =item B<loop>
+
+=back
+
+=over 4
+
+=item B<getSrcIntfFromDst>
+
+=item B<getSrcIpFromDst>
 
 =back
 

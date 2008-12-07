@@ -1,11 +1,11 @@
 #
-# $Id: Fw.pm 15 2008-11-25 21:42:31Z gomor $
+# $Id: Fw.pm 19 2008-12-06 17:06:25Z gomor $
 #
 package Net::Libdnet::Fw;
 use strict; use warnings;
 
-require Class::Gomor::Array;
-our @ISA = qw(Class::Gomor::Array);
+use base qw(Class::Gomor::Array);
+
 our @AS  = qw(
    _handle
 );
@@ -58,12 +58,12 @@ sub _to_hash {
       }
    }
    if (defined($op)) {
-         if ($op =~ /block/i) { $op = FW_OP_BLOCK }
-      elsif ($op =~ /allow/i) { $op = FW_OP_ALLOW }
+         if ($op =~ /block/i) { $op = DNET_FW_OP_BLOCK }
+      elsif ($op =~ /allow/i) { $op = DNET_FW_OP_ALLOW }
    }
    if (defined($dir)) {
-         if ($dir =~ /in/i)  { $dir = FW_DIR_IN  }
-      elsif ($dir =~ /out/i) { $dir = FW_DIR_OUT }
+         if ($dir =~ /in/i)  { $dir = DNET_FW_DIR_IN  }
+      elsif ($dir =~ /out/i) { $dir = DNET_FW_DIR_OUT }
    }
    if (defined($proto)) {
          if ($proto =~ /tcp/i)  { $proto = 0x06 }
@@ -72,8 +72,8 @@ sub _to_hash {
    }
    my $h = {
       fw_device => $device || 'any',
-      fw_op     => $op     || FW_OP_BLOCK,
-      fw_dir    => $dir    || FW_DIR_IN,
+      fw_op     => $op     || DNET_FW_OP_BLOCK,
+      fw_dir    => $dir    || DNET_FW_DIR_IN,
       fw_proto  => $proto  || 0,
       fw_src    => $src    || '0.0.0.0/0',
       fw_dst    => $dst    || '0.0.0.0/0',
