@@ -1,5 +1,5 @@
 #
-# $Id: Ip.pm 19 2008-12-06 17:06:25Z gomor $
+# $Id: Ip.pm 26 2009-05-13 19:01:18Z gomor $
 #
 package Net::Libdnet::Ip;
 use strict; use warnings;
@@ -75,6 +75,6 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the BSD license. See LICENSE file in the source distribution archive.
 
-Copyright (c) 2008, Patrice <GomoR> Auffret
+Copyright (c) 2008-2009, Patrice <GomoR> Auffret
 
 =cut

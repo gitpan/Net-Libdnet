@@ -1,8 +1,8 @@
 #
-# $Id: Libdnet.pm 21 2008-12-07 18:20:36Z gomor $
+# $Id: Libdnet.pm 26 2009-05-13 19:01:18Z gomor $
 #
 # Copyright (c) 2004 Vlad Manilici
-# Copyright (c) 2008 Patrice <GomoR> Auffret
+# Copyright (c) 2008-2009 Patrice <GomoR> Auffret
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,7 +33,7 @@ use strict; use warnings;
 
 use base qw(Exporter DynaLoader);
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 our %EXPORT_TAGS = (
    obsolete => [qw(

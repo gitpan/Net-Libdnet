@@ -1,8 +1,8 @@
-/* $Id: Libdnet.xs 19 2008-12-06 17:06:25Z gomor $ */
+/* $Id: Libdnet.xs 26 2009-05-13 19:01:18Z gomor $ */
 
 /*
  * Copyright (c) 2004 Vlad Manilici
- * Copyright (c) 2008 Patrice <GomoR> Auffret
+ * Copyright (c) 2008-2009 Patrice <GomoR> Auffret
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -853,10 +853,13 @@ SV *
 dnet_intf_get(handle, entry)
       IntfHandle *handle
       SV         *entry
-   INIT:
+   PREINIT:
       char        buf[1024];
-      IntfEntry  *intfEntry    = (IntfEntry *)buf;
-      IntfEntry  *intfEntryPtr = NULL;
+      IntfEntry  *intfEntry;
+      IntfEntry  *intfEntryPtr;
+   INIT:
+      intfEntry    = (IntfEntry *)buf;
+      intfEntryPtr = NULL;
       memset(buf, 0, sizeof(buf));
       intfEntryPtr = intf_sv2c(entry, intfEntry);
       intfEntry->intf_len = sizeof(buf);
@@ -870,14 +873,17 @@ SV *
 dnet_intf_get_src(handle, src)
       IntfHandle *handle
       SV         *src
-   INIT:
+   PREINIT:
       char        buf[1024];
-      IntfEntry  *intfEntry = (IntfEntry *)buf;
-      memset(buf, 0, sizeof(buf));
+      IntfEntry  *intfEntry; 
       struct addr aSrc;
+      int ret;
+   INIT:
+      intfEntry = (IntfEntry *)buf;
+      memset(buf, 0, sizeof(buf));
       intfEntry->intf_len = sizeof(buf);
       memset(&aSrc, 0, sizeof(struct addr));
-      int ret = addr_aton(SvPV(src, PL_na), &aSrc);
+      ret = addr_aton(SvPV(src, PL_na), &aSrc);
    CODE:
       if (! ret && intf_get_src(handle, intfEntry, &aSrc) == -1) {
          XSRETURN_UNDEF;
@@ -890,14 +896,17 @@ SV *
 dnet_intf_get_dst(handle, dst)
       IntfHandle *handle
       SV         *dst
-   INIT:
+   PREINIT:
       char        buf[1024];
-      IntfEntry  *intfEntry = (IntfEntry *)buf;
       struct addr aDst;
+      int ret;
+      IntfEntry  *intfEntry;
+   INIT:
+      intfEntry = (IntfEntry *)buf;
       memset(buf, 0, sizeof(buf));
       intfEntry->intf_len = sizeof(buf);
       memset(&aDst, 0, sizeof(struct addr));
-      int ret = addr_aton(SvPV(dst, PL_na), &aDst);
+      ret = addr_aton(SvPV(dst, PL_na), &aDst);
    CODE:
       if (! ret && intf_get_dst(handle, intfEntry, &aDst) == -1) {
          XSRETURN_UNDEF;
@@ -910,9 +919,11 @@ int
 dnet_intf_set(handle, entry)
       IntfHandle *handle
       SV         *entry
-   INIT:
-      IntfEntry *intfEntryPtr = NULL;
+   PREINIT:
+         IntfEntry *intfEntryPtr;
       IntfEntry  intfEntry;
+   INIT:
+      intfEntryPtr = NULL;
       intfEntryPtr = intf_sv2c(entry, &intfEntry);
    CODE:
       if (intf_set(handle, &intfEntry) == -1) { XSRETURN_UNDEF; }
@@ -953,9 +964,11 @@ int
 dnet_arp_add(handle, entry)
       ArpHandle *handle
       SV        *entry
-   INIT:
-      ArpEntry *arpEntryPtr = NULL;
+   PREINIT:
       ArpEntry  arpEntry;
+      ArpEntry *arpEntryPtr;
+   INIT:
+      arpEntryPtr = NULL;
       arpEntryPtr = arp_sv2c(entry, &arpEntry);
    CODE:
       RETVAL = arp_add(handle, arpEntryPtr);
@@ -968,9 +981,11 @@ int
 dnet_arp_delete(handle, entry)
       ArpHandle *handle
       SV        *entry
-   INIT:
-      ArpEntry *arpEntryPtr = NULL;
+   PREINIT:
       ArpEntry  arpEntry;
+      ArpEntry *arpEntryPtr;
+   INIT:
+      arpEntryPtr = NULL;
       arpEntryPtr = arp_sv2c(entry, &arpEntry);
    CODE:
       RETVAL = arp_delete(handle, arpEntryPtr);
@@ -983,9 +998,11 @@ SV *
 dnet_arp_get(handle, entry)
       ArpHandle *handle
       SV        *entry
-   INIT:
-      ArpEntry *arpEntryPtr = NULL;
+   PREINIT:
+      ArpEntry *arpEntryPtr;
       ArpEntry  arpEntry;
+   INIT:
+      arpEntryPtr = NULL;
       arpEntryPtr = arp_sv2c(entry, &arpEntry);
    CODE:
       if (arp_get(handle, arpEntryPtr) == -1) { XSRETURN_UNDEF; }
@@ -1026,9 +1043,11 @@ int
 dnet_route_add(handle, entry)
       RouteHandle *handle
       SV          *entry
-   INIT:
-      RouteEntry *routeEntryPtr = NULL;
+   PREINIT:
       RouteEntry  routeEntry;
+      RouteEntry *routeEntryPtr;
+   INIT:
+      routeEntryPtr = NULL;
       routeEntryPtr = route_sv2c(entry, &routeEntry);
    CODE:
       RETVAL = route_add(handle, routeEntryPtr);
@@ -1041,9 +1060,11 @@ int
 dnet_route_delete(handle, entry)
       RouteHandle *handle
       SV          *entry
-   INIT:
-      RouteEntry *routeEntryPtr = NULL;
+   PREINIT:
       RouteEntry  routeEntry;
+      RouteEntry *routeEntryPtr;
+   INIT:
+      routeEntryPtr = NULL;
       routeEntryPtr = route_sv2c(entry, &routeEntry);
    CODE:
       RETVAL = route_delete(handle, routeEntryPtr);
@@ -1056,9 +1077,11 @@ SV *
 dnet_route_get(handle, entry)
       RouteHandle *handle
       SV          *entry
-   INIT:
-      RouteEntry *routeEntryPtr = NULL;
+   PREINIT:
       RouteEntry  routeEntry;
+      RouteEntry *routeEntryPtr;
+   INIT:
+      routeEntryPtr = NULL;
       routeEntryPtr = route_sv2c(entry, &routeEntry);
    CODE:
       if (route_get(handle, routeEntryPtr) == -1) { XSRETURN_UNDEF; }
@@ -1100,9 +1123,11 @@ int
 dnet_fw_add(handle, rule)
       FwHandle *handle
       SV       *rule
-   INIT:
-      FwRule *fwRulePtr = NULL;
+   PREINIT:
       FwRule  fwRule;
+      FwRule *fwRulePtr;
+   INIT:
+      fwRulePtr = NULL;
       fwRulePtr = fw_sv2c(rule, &fwRule);
    CODE:
       RETVAL = fw_add(handle, fwRulePtr);
@@ -1115,9 +1140,11 @@ int
 dnet_fw_delete(handle, rule)
       FwHandle *handle
       SV       *rule
-   INIT:
-      FwRule *fwRulePtr = NULL;
+   PREINIT:
       FwRule  fwRule;
+      FwRule *fwRulePtr;
+   INIT:
+      fwRulePtr = NULL;
       fwRulePtr = fw_sv2c(rule, &fwRule);
    CODE:
       RETVAL = fw_delete(handle, fwRulePtr);
@@ -1198,9 +1225,10 @@ SV *
 dnet_tun_recv(handle, size)
       TunHandle *handle
       int        size
-   INIT:
+   PREINIT:
       int read;
       unsigned char buf[size+1];
+   INIT:
       memset(buf, 0, size+1);
    CODE:
       if ((read = tun_recv(handle, buf, size)) > 0) {
@@ -1229,9 +1257,10 @@ dnet_eth_open(device)
 SV *
 dnet_eth_get(handle)
       EthHandle *handle
-   INIT:
+   PREINIT:
       char *addr;
       EthAddr a;
+   INIT:
       memset(&a, 0, sizeof(EthAddr));
    CODE:
       if (eth_get(handle, &a) == -1)     { XSRETURN_UNDEF; }
