@@ -1,5 +1,5 @@
 #
-# $Id: Intf.pm 26 2009-05-13 19:01:18Z gomor $
+# $Id: Intf.pm 31 2011-01-12 12:52:47Z gomor $
 #
 package Net::Libdnet::Entry::Intf;
 use strict; use warnings;
@@ -30,6 +30,14 @@ __PACKAGE__->cgBuildAccessorsArray (\@AA);
 
 use Net::Libdnet qw(:consts :obsolete);
 
+sub new {
+   my $self = shift->SUPER::new(
+      aliasAddrs => [],
+      @_,
+   );
+   return $self;
+}
+
 sub newFromHash {
    my $self = shift->SUPER::new;
    my ($h) = @_;
@@ -51,6 +59,24 @@ sub newFromHash {
       $self->cidr($cidr) if defined($cidr);
    }
    return $self;
+}
+
+sub tohash {
+   my $self = shift;
+
+   my %hash;
+   $hash{intf_alias_num}   = $self->aliasNum   if defined($self->aliasNum);
+   $hash{intf_mtu}         = $self->mtu        if defined($self->mtu);
+   $hash{intf_len}         = $self->len        if defined($self->len);
+   $hash{intf_type}        = $self->type       if defined($self->type);
+   $hash{intf_name}        = $self->name       if defined($self->name);
+   $hash{intf_dst_addr}    = $self->dstAddr    if defined($self->dstAddr);
+   $hash{intf_link_addr}   = $self->linkAddr   if defined($self->linkAddr);
+   $hash{intf_flags}       = $self->flags      if defined($self->flags);
+   $hash{intf_alias_addrs} = $self->aliasAddrs if defined($self->aliasAddrs);
+   $hash{intf_addr}        = $self->addr       if defined($self->addr);
+
+   return \%hash;
 }
 
 #
@@ -174,6 +200,6 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the BSD license. See LICENSE file in the source distribution archive.
 
-Copyright (c) 2008-2009, Patrice <GomoR> Auffret
+Copyright (c) 2008-2011, Patrice <GomoR> Auffret
 
 =cut

@@ -1,5 +1,10 @@
 Revision history for Perl extension Net::Libdnet.
 
+0.93 Thu Jan 13 11:07:07 CET 2011
+   - update: makes components more inline with local install 
+     of libdnet
+   - update: copyright notice
+
 0.92 Wed May 13 20:59:41 CEST 2009
    - applied http://rt.cpan.org/Ticket/Display.html?id=43899
    - applied http://rt.cpan.org/Ticket/Display.html?id=45697

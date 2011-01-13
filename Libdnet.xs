@@ -1,8 +1,8 @@
-/* $Id: Libdnet.xs 26 2009-05-13 19:01:18Z gomor $ */
+/* $Id: Libdnet.xs 31 2011-01-12 12:52:47Z gomor $ */
 
 /*
  * Copyright (c) 2004 Vlad Manilici
- * Copyright (c) 2008-2009 Patrice <GomoR> Auffret
+ * Copyright (c) 2008-2011 Patrice <GomoR> Auffret
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -36,15 +36,39 @@
 #include <stdio.h>
 #include <dnet.h>
 
+#ifdef DNET_BLOB_H
 typedef blob_t              Blob;
-typedef eth_addr_t          EthAddr;
+#endif
+
+#ifdef DNET_ETH_H
 typedef eth_t               EthHandle;
+typedef eth_addr_t          EthAddr;
+#endif
+
+#ifdef DNET_INTF_H
 typedef intf_t              IntfHandle;
+#endif
+
+#ifdef DNET_ARP_H
 typedef arp_t               ArpHandle;
+#endif
+
+#ifdef DNET_FW_H
 typedef fw_t                FwHandle;
+#endif
+
+#ifdef DNET_ROUTE_H
 typedef route_t             RouteHandle;
+#endif
+
+#ifdef DNET_TUN_H
 typedef tun_t               TunHandle;
+#endif
+
+#ifdef DNET_IP_H
 typedef ip_t                IpHandle;
+#endif
+
 typedef struct intf_entry   IntfEntry;
 typedef struct arp_entry    ArpEntry;
 typedef struct fw_rule      FwRule;
@@ -838,9 +862,11 @@ _obsolete_route_get(SvDstAddr)
 
 #
 # The following are the new XS implementation.
-# I prefixed with dnet_ in order to not clash with libdnet C functions use by 
+# I prefixed with dnet_ in order to not clash with libdnet C functions used by 
 # obsolete XS implementation.
 #
+
+#if defined DNET_INTF_H
 
 IntfHandle *
 dnet_intf_open()
@@ -953,6 +979,10 @@ dnet_intf_close(handle)
    OUTPUT:
       RETVAL
 
+#endif
+
+#if defined DNET_ARP_H
+
 ArpHandle *
 dnet_arp_open()
    CODE:
@@ -1031,6 +1061,10 @@ dnet_arp_close(handle)
       RETVAL = arp_close(handle);
    OUTPUT:
       RETVAL
+
+#endif
+
+#if defined DNET_ROUTE_H
 
 RouteHandle *
 dnet_route_open()
@@ -1112,6 +1146,10 @@ dnet_route_close(handle)
    OUTPUT:
       RETVAL
 
+#endif
+
+#if defined DNET_FW_H
+
 FwHandle *
 dnet_fw_open()
    CODE:
@@ -1174,6 +1212,10 @@ dnet_fw_close(handle)
       RETVAL = fw_close(handle);
    OUTPUT:
       RETVAL
+
+#endif
+
+#if defined DNET_TUN_H
 
 TunHandle *
 dnet_tun_open(src, dst, size)
@@ -1246,6 +1288,10 @@ dnet_tun_close(handle)
    OUTPUT:
       RETVAL
 
+#endif
+
+#if defined DNET_ETH_H
+
 EthHandle *
 dnet_eth_open(device)
       SV *device
@@ -1298,6 +1344,10 @@ dnet_eth_close(handle)
    OUTPUT:
       RETVAL
 
+#endif
+
+#if defined DNET_IP_H
+
 IpHandle *
 dnet_ip_open()
    CODE:
@@ -1330,3 +1380,5 @@ dnet_ip_close(handle)
       RETVAL = ip_close(handle);
    OUTPUT:
       RETVAL
+
+#endif
