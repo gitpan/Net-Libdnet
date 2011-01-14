@@ -1,5 +1,5 @@
 #
-# $Id: Libdnet.pm 33 2011-01-12 12:53:20Z gomor $
+# $Id: Libdnet.pm 37 2011-01-14 07:50:03Z gomor $
 #
 # Copyright (c) 2004 Vlad Manilici
 # Copyright (c) 2008-2011 Patrice <GomoR> Auffret
@@ -33,7 +33,7 @@ use strict; use warnings;
 
 use base qw(Exporter DynaLoader);
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 our %EXPORT_TAGS = (
    obsolete => [qw(

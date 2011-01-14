@@ -1,4 +1,4 @@
-/* $Id: arp_entry.c 31 2011-01-12 12:52:47Z gomor $ */
+/* $Id: arp_entry.c 36 2011-01-14 07:48:43Z gomor $ */
 
 /*
  * Copyright (c) 2008-2011 Patrice <GomoR> Auffret
@@ -33,15 +33,16 @@ arp_c2sv(ArpEntry *entry)
 {
    HV *out     = newHV();
    SV *out_ref = newRV_noinc((SV *)out);
+   char *pa, *ha;
 
-   char *pa = addr_ntoa(&(entry->arp_pa));
+   pa = addr_ntoa(&(entry->arp_pa));
    if (pa == NULL) {
       hv_store(out, "arp_pa", 6, &PL_sv_undef, 0);
    }
    else {
       hv_store(out, "arp_pa", 6, newSVpv(pa, 0), 0);
    }
-   char *ha = addr_ntoa(&(entry->arp_ha));
+   ha = addr_ntoa(&(entry->arp_ha));
    if (ha == NULL) {
       hv_store(out, "arp_ha", 6, &PL_sv_undef, 0);
    }

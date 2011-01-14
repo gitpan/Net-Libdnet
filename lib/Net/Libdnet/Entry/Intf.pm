@@ -1,5 +1,5 @@
 #
-# $Id: Intf.pm 31 2011-01-12 12:52:47Z gomor $
+# $Id: Intf.pm 39 2011-01-14 10:12:06Z gomor $
 #
 package Net::Libdnet::Entry::Intf;
 use strict; use warnings;
@@ -189,6 +189,8 @@ XXX
 =item B<mask2cidr>
 
 =item B<print>
+
+=item B<tohash>
 
 =back
 

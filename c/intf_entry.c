@@ -1,4 +1,4 @@
-/* $Id: intf_entry.c 31 2011-01-12 12:52:47Z gomor $ */
+/* $Id: intf_entry.c 36 2011-01-14 07:48:43Z gomor $ */
 
 /*
  * Copyright (c) 2008-2011 Patrice <GomoR> Auffret
@@ -33,6 +33,7 @@ intf_c2sv(IntfEntry *entry)
 {
    HV *out     = newHV();
    SV *out_ref = newRV_noinc((SV *)out);
+   char *sAddr, *sDstAddr, *sLnkAddr;
 
    hv_store(out, "intf_len",    8, newSViv(entry->intf_len), 0);
    hv_store(out, "intf_name",   9, newSVpv(entry->intf_name, 0), 0);
@@ -40,21 +41,21 @@ intf_c2sv(IntfEntry *entry)
    hv_store(out, "intf_flags", 10, newSViv(entry->intf_flags), 0);
    hv_store(out, "intf_mtu",    8, newSViv(entry->intf_mtu), 0);
 
-   char *sAddr = addr_ntoa(&(entry->intf_addr));
+   sAddr = addr_ntoa(&(entry->intf_addr));
    if (sAddr == NULL) {
       hv_store(out, "intf_addr", 9, &PL_sv_undef, 0);
    }
    else {
       hv_store(out, "intf_addr", 9, newSVpv(sAddr, 0), 0);
    }
-   char *sDstAddr = addr_ntoa(&(entry->intf_dst_addr));
+   sDstAddr = addr_ntoa(&(entry->intf_dst_addr));
    if (sDstAddr == NULL) {
       hv_store(out, "intf_dst_addr", 13, &PL_sv_undef, 0);
    }
    else {
       hv_store(out, "intf_dst_addr", 13, newSVpv(sDstAddr, 0), 0);
    }
-   char *sLnkAddr = addr_ntoa(&(entry->intf_link_addr));
+   sLnkAddr = addr_ntoa(&(entry->intf_link_addr));
    if (sLnkAddr == NULL) {
       hv_store(out, "intf_link_addr", 14, &PL_sv_undef, 0);
    }

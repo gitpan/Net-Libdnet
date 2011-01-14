@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Net-Libdnet
-version:            0.93
+version:            0.94
 abstract:           binding for Dug Song's libdnet
 author:
     - GomoR <gomor-cpan_at_gomor.org>

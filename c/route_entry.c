@@ -1,4 +1,4 @@
-/* $Id: route_entry.c 31 2011-01-12 12:52:47Z gomor $ */
+/* $Id: route_entry.c 36 2011-01-14 07:48:43Z gomor $ */
 
 /*
  * Copyright (c) 2008-2011 Patrice <GomoR> Auffret
@@ -33,11 +33,12 @@ route_c2sv(RouteEntry *entry)
 {
    HV *out     = newHV();
    SV *out_ref = newRV_noinc((SV *)out);
+   char *dst, *gw;
    if (entry != NULL) {
-      char *dst = addr_ntoa(&(entry->route_dst));
+      dst = addr_ntoa(&(entry->route_dst));
       dst == NULL ? hv_store(out, "route_dst", 9, &PL_sv_undef, 0)
                   : hv_store(out, "route_dst", 9, newSVpv(dst, 0), 0);
-      char *gw = addr_ntoa(&(entry->route_gw));
+      gw = addr_ntoa(&(entry->route_gw));
       gw == NULL ? hv_store(out, "route_gw", 8, &PL_sv_undef, 0)
                  : hv_store(out, "route_gw", 8, newSVpv(gw, 0), 0);
    }

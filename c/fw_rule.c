@@ -1,4 +1,4 @@
-/* $Id: fw_rule.c 31 2011-01-12 12:52:47Z gomor $ */
+/* $Id: fw_rule.c 36 2011-01-14 07:48:43Z gomor $ */
 
 /*
  * Copyright (c) 2008-2011 Patrice <GomoR> Auffret
@@ -33,28 +33,30 @@ fw_c2sv(FwRule *rule)
 {
    HV *out     = newHV();
    SV *out_ref = newRV_noinc((SV *)out);
+   AV *sport, *dport;
+   char *src, *dst;
+   int i;
 
    hv_store(out, "fw_device", 9, newSVpv(rule->fw_device, 0), 0);
    hv_store(out, "fw_op", 5, newSViv(rule->fw_op), 0);
    hv_store(out, "fw_dir", 6, newSViv(rule->fw_dir), 0);
    hv_store(out, "fw_proto", 8, newSViv(rule->fw_proto), 0);
-   char *src = addr_ntoa(&(rule->fw_src));
+   src = addr_ntoa(&(rule->fw_src));
    if (src == NULL) {
       hv_store(out, "fw_src", 6, &PL_sv_undef, 0);
    }
    else {
       hv_store(out, "fw_src", 6, newSVpv(src, 0), 0);
    }
-   char *dst = addr_ntoa(&(rule->fw_dst));
+   dst = addr_ntoa(&(rule->fw_dst));
    if (dst == NULL) {
       hv_store(out, "fw_dst", 6, &PL_sv_undef, 0);
    }
    else {
       hv_store(out, "fw_dst", 6, newSVpv(dst, 0), 0);
    }
-   int i;
-   AV *sport = newAV();
-   AV *dport = newAV();
+   sport = newAV();
+   dport = newAV();
    for (i=0; i<2; i++) {
       av_push(sport, newSViv(rule->fw_sport[i]));
       av_push(dport, newSViv(rule->fw_dport[i]));
