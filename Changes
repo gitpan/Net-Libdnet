@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Libdnet.
 
+0.95 Sun Mar 13 23:47:10 CET 2011
+   - new: added ubuntu and standard patchs. See README.
+
 0.94 Fri Jan 14 11:09:49 CET 2011
    - bugfix: tohash method in pod
    - applied http://rt.cpan.org/Public/Bug/Display.html?id=52359

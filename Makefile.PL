@@ -3,10 +3,10 @@
 #
 use ExtUtils::MakeMaker;
 
-my $libs = qx{dnet-config --libs 2>/dev/null}
-   || ['-L/lib -L/usr/lib -L/usr/local/lib -ldnet'];
+my $libs = qx{dumbnet-config --libs 2>/dev/null}
+   || ['-L/lib -L/usr/lib -L/usr/local/lib -ldumbnet'];
 
-my $inc = qx{dnet-config --cflags 2>/dev/null}
+my $inc = qx{dumbnet-config --cflags 2>/dev/null}
    || '-I/include -I/usr/include -I/usr/local/include';
 
 WriteMakefile(

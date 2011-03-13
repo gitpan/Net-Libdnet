@@ -1,12 +1,12 @@
 #
-# $Id: Intf.pm 31 2011-01-12 12:52:47Z gomor $
+# $Id: Intf.pm 49 2011-03-13 22:42:45Z gomor $
 #
 package Net::Libdnet::Intf;
 use strict; use warnings;
 
 use base qw(Class::Gomor::Array);
 
-our @AS  = qw(
+our @AS = qw(
    _handle
 );
 __PACKAGE__->cgBuildIndices;

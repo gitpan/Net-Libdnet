@@ -34,13 +34,27 @@ WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
 This being said, you need to set the environment variable REAL_TESTS
 and have root privileges to run the non-faked tests.
 
+UBUNTU/DEBIAN USERS
+
+You will have to apply ubuntu-new.patch like the following:
+
+   $ cd Net-Libdnet-X.YY
+   $ patch -p0 < ubuntu-new.patch
+
+To revert back to standard configuration:
+
+   $ patch -p0 < standard-new.patch
+
+If you use an old version of Ubuntu/Debian (don't know which version),
+you'll have to use ubuntu-old.patch and standard-old.patch files instead.
+
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  Perl v5.6.1
-  libdnet
-  Class::Gomor
+   Perl v5.6.1
+   libdnet
+   Class::Gomor
 
 libdnet may be obtained from http://libdnet.sourceforge.net/.
 
