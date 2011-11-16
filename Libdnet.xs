@@ -34,7 +34,7 @@
 #include "XSUB.h"
 
 #include <stdio.h>
-#include <dumbnet.h>
+#include <dnet.h>
 
 #ifdef DNET_BLOB_H
 typedef blob_t              Blob;

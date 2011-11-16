@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Libdnet.
 
+0.96 Wed Nov 16 23:07:38 CET 2011
+   - bugfix: default to be compiled against libdnet (and not libdumbnet)
+   - update: added some die() in example programs
+
 0.95 Sun Mar 13 23:47:10 CET 2011
    - new: added ubuntu and standard patchs. See README.
 
