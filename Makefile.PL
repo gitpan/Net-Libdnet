@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 25 2009-05-13 18:53:14Z gomor $
+# $Id: Makefile.PL 57 2012-11-02 16:39:39Z gomor $
 #
 use ExtUtils::MakeMaker;
 
@@ -22,4 +22,5 @@ WriteMakefile(
    PREREQ_PM     => {
       Class::Gomor => 0,
    },
+   MIN_PERL_VERSION => '5.6.1',
 );

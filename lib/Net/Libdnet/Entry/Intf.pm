@@ -1,5 +1,5 @@
 #
-# $Id: Intf.pm 39 2011-01-14 10:12:06Z gomor $
+# $Id: Intf.pm 57 2012-11-02 16:39:39Z gomor $
 #
 package Net::Libdnet::Entry::Intf;
 use strict; use warnings;
@@ -202,6 +202,6 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the BSD license. See LICENSE file in the source distribution archive.
 
-Copyright (c) 2008-2011, Patrice <GomoR> Auffret
+Copyright (c) 2008-2012, Patrice <GomoR> Auffret
 
 =cut

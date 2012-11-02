@@ -1,8 +1,8 @@
 #
-# $Id: Libdnet.pm 54 2011-11-14 21:59:34Z gomor $
+# $Id: Libdnet.pm 57 2012-11-02 16:39:39Z gomor $
 #
 # Copyright (c) 2004 Vlad Manilici
-# Copyright (c) 2008-2011 Patrice <GomoR> Auffret
+# Copyright (c) 2008-2012 Patrice <GomoR> Auffret
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,7 +33,7 @@ use strict; use warnings;
 
 use base qw(Exporter DynaLoader);
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 our %EXPORT_TAGS = (
    obsolete => [qw(
@@ -137,13 +137,6 @@ our @EXPORT = (
 );
 
 __PACKAGE__->bootstrap($VERSION);
-
-our $Dnet6Support = 0;
-
-eval("use Net::Libdnet6;");
-if (!$@) {
-   $Dnet6Support++;
-}
 
 use constant DNET_ADDR_TYPE_NONE => 0;
 use constant DNET_ADDR_TYPE_ETH  => 1;
@@ -638,7 +631,7 @@ You may distribute this module under the terms of the BSD license. See LICENSE f
 
 Copyright (c) 2004, Vlad Manilici
 
-Copyright (c) 2008-2011, Patrice <GomoR> Auffret
+Copyright (c) 2008-2012, Patrice <GomoR> Auffret
 
 =head1 SEE ALSO
 

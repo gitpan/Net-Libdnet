@@ -1,7 +1,7 @@
-/* $Id: arp_entry.c 36 2011-01-14 07:48:43Z gomor $ */
+/* $Id: arp_entry.c 57 2012-11-02 16:39:39Z gomor $ */
 
 /*
- * Copyright (c) 2008-2011 Patrice <GomoR> Auffret
+ * Copyright (c) 2008-2012 Patrice <GomoR> Auffret
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions

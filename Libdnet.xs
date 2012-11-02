@@ -1,8 +1,8 @@
-/* $Id: Libdnet.xs 31 2011-01-12 12:52:47Z gomor $ */
+/* $Id: Libdnet.xs 57 2012-11-02 16:39:39Z gomor $ */
 
 /*
  * Copyright (c) 2004 Vlad Manilici
- * Copyright (c) 2008-2011 Patrice <GomoR> Auffret
+ * Copyright (c) 2008-2012 Patrice <GomoR> Auffret
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
