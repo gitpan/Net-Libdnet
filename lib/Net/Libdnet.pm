@@ -1,5 +1,5 @@
 #
-# $Id: Libdnet.pm 57 2012-11-02 16:39:39Z gomor $
+# $Id: Libdnet.pm 59 2012-11-22 19:21:36Z gomor $
 #
 # Copyright (c) 2004 Vlad Manilici
 # Copyright (c) 2008-2012 Patrice <GomoR> Auffret
@@ -33,7 +33,7 @@ use strict; use warnings;
 
 use base qw(Exporter DynaLoader);
 
-our $VERSION = '0.97';
+our $VERSION = '0.98';
 
 our %EXPORT_TAGS = (
    obsolete => [qw(
@@ -333,7 +333,7 @@ Net::Libdnet provides a simplified, portable interface to several low-level netw
 
 All the original and obsolete functions return I<undef> and print a warning message to the standard error when a problem occurs. The obsolete functions are: B<addr_cmp>, B<addr_bcast>, B<addr_net>, B<arp_add>, B<arp_delete>, B<arp_get>, B<intf_get>, B<intf_get_src>, B<intf_get_dst>, B<route_add>, B<route_delete>, B<route_get>.
 
-These osbsolete functions will continue to work, to keep backward compatibility, but should not be used anymore. The new APIs should be prefered. There are two new APIs, one is the low-level one, matching libdnet functions, and the other one is a high-level API, matching a more Perl object oriented programming. This latest one is highly prefered.
+These obsolete functions will continue to work, to keep backward compatibility, but should not be used anymore. The new APIs should be preferred. There are two new APIs, one is the low-level one, matching libdnet functions, and the other one is a high-level API, matching a more Perl object oriented programming. This latest one is highly preferred.
 
 Net::Libdnet module implements the low-level API. The high-level API is accessible by using the following modules: B<Net::Libdnet::Intf>, B<Net::Libdnet::Route>, B<Net::Libdnet::Fw>, B<Net::Libdnet::Arp>, B<Net::Libdnet::Eth>, B<Net::Libdnet::Ip> and B<Net::Libdnet::Tun>.
 

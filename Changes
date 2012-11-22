@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Libdnet.
 
+0.98 Thu Nov 22 20:20:57 CET 2012
+   - bugfix: applied https://rt.cpan.org/Public/Bug/Display.html?id=72729
+
 0.97 Fri Nov  2 17:39:36 CET 2012
    - update: removed support for Libdnet6 checking code
    - update: copyright notice
